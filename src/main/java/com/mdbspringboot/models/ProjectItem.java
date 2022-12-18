@@ -2,22 +2,24 @@ package com.mdbspringboot.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.List;
+import java.util.UUID;
 
 @Document("projectitems")
 public class ProjectItem {
-    @Id
-    private String id;
+    @MongoId
+    private UUID _id;
 
     private String name;
 
-    public String getId() {
-        return id;
+    public UUID getId() {
+        return _id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(UUID _id) {
+        this._id = _id;
     }
 
     public String getName() {
@@ -47,9 +49,9 @@ public class ProjectItem {
     private String description;
     private List<String> notes;
 
-    public ProjectItem(String id, String name, String description, List<String> notes) {
+    public ProjectItem(String name, String description, List<String> notes) {
         super();
-        this.id = id;
+        this._id = UUID.randomUUID();
         this.name = name;
         this.description = description;
         this.notes = notes;

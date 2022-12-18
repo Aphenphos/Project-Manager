@@ -1,34 +1,45 @@
 package com.mdbspringboot.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.mdbspringboot.models.ProjectItem;
 import com.mdbspringboot.repository.ProjectRepository;
+import com.mongodb.MongoException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class AppController {
     @Autowired
     ProjectRepository projectRepository;
-    @GetMapping("/")
+    @GetMapping("/getAll")
     public List<ProjectItem> getAll() {
         return new ArrayList<ProjectItem>(projectRepository.findAll());
     }
 
-    @GetMapping("/post")
-    public String newProject() {
-        projectRepository.save(new ProjectItem("2", "DSNA-Visualiser", "Full Stack App that displays a data structure", new ArrayList<>()));
-        return null;
+    @RequestMapping("/post")
+    public ProjectItem newProject(@RequestBody ProjectItem newProj) {
+        try {
+            return projectRepository.save(newProj);
+        } catch (Exception e) {
+            throw new MongoException("Failed to save project.");
+        }
     }
-
-    @GetMapping("/delete")
-    public String deleteProject(@RequestParam String id) {
-        projectRepository.deleteById(id);
-        return null;
+    @DeleteMapping("/delete")
+    public ProjectItem deleteProject(@RequestParam String id) {
+    //http:link/delete?id=uuidHere
+        if (projectRepository.findById(id).isPresent()) {
+            ProjectItem projectToDelete = projectRepository.findById(id).get();
+            projectRepository.delete(projectToDelete);
+            return projectToDelete;
+        } else {
+            throw new MongoException("Project Not Found");
+        }
     }
 
 }
